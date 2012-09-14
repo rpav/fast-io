@@ -32,6 +32,8 @@ octet-vector with 50 bytes, 50000 times, here are the results (SBCL
 </tr>
 </table>
 
+(See `t/benchmarks.lisp` for the exact code used.)
+
 It *should* be surprising that it takes a nontrivial effort to achieve
 relatively decent performance to octet-vectors, but probably isn't.
 However, fast-io provides a relatively straightforward interface for
