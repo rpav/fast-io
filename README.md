@@ -1,13 +1,5 @@
 # fast-io
 
-<style>
-table, td, th {
-  border-collapse: collapse;
-  border: 1px solid black;
-  padding: 5px;
-}
-</style>
-
 ```lisp
 (deftype octet '(unsigned-byte 8))
 (deftype octet-vector '(simple-array octet (*)))
