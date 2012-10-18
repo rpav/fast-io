@@ -11,7 +11,7 @@
   (len 0 :type index)
   (queue nil :type list)
   (last nil :type list)
-  (stream nil))
+  (output nil))
 
 (defstruct input-buffer
   (vector nil :type (or null octet-vector))
@@ -30,7 +30,10 @@
 
 (defun concat-buffer (buffer)
   (let* ((len (output-buffer-len buffer))
-         (array (make-octet-vector len)))
+         (array
+           (if (eq :static (output-buffer-output buffer))
+               (static-vectors:make-static-vector (the index len))
+               (make-octet-vector len))))
     (loop as i = 0 then (+ i (length a))
           for a in (output-buffer-queue buffer) do
             (replace (the octet-vector array)
@@ -45,7 +48,7 @@
 (defun flush (output-buffer)
   (when (> (output-buffer-fill output-buffer) 0)
     (write-sequence (output-buffer-vector output-buffer)
-                    (output-buffer-stream output-buffer))
+                    (output-buffer-output output-buffer))
     (prog1 (output-buffer-fill output-buffer)
       (setf (output-buffer-fill output-buffer) 0))))
 
@@ -66,7 +69,7 @@
            (type output-buffer output-buffer))
   (when (= (output-buffer-fill output-buffer)
            (array-dimension (output-buffer-vector output-buffer) 0))
-    (if (output-buffer-stream output-buffer)
+    (if (streamp (output-buffer-output output-buffer))
         (flush output-buffer)
         (extend output-buffer)))
   (prog1
@@ -91,10 +94,10 @@
       eof-value))
 
 (defun fast-write-sequence (sequence output-buffer &optional (start 0) end)
-  (if (output-buffer-stream output-buffer)
+  (if (streamp (output-buffer-output output-buffer))
       (progn
         (flush output-buffer)
-        (write-sequence sequence (output-buffer-stream output-buffer) :start start :end end))
+        (write-sequence sequence (output-buffer-output output-buffer) :start start :end end))
       (progn
         (let* ((start2 start)
                (len (if end
@@ -149,10 +152,11 @@
 (defun finish-output-buffer (output-buffer)
   (concat-buffer output-buffer))
 
-(defmacro with-fast-output ((buffer &optional stream) &body body)
-  `(let ((,buffer (make-output-buffer :stream ,stream)))
+(defmacro with-fast-output ((buffer &optional output) &body body)
+  "Create `BUFFER`, optionally outputting to ``."
+  `(let ((,buffer (make-output-buffer :output ,output)))
      ,@body
-     (if (output-buffer-stream ,buffer)
+     (if (streamp (output-buffer-output ,buffer))
          (flush ,buffer)
          (finish-output-buffer ,buffer))))
 
@@ -219,14 +223,14 @@
                as bytes = (truncate bits 8)
                collect
                `(progn
-                  (defun ,(first fun) (stream)
-                    (unsigned-to-signed (read-unsigned-be ,bytes stream) ,bytes))
-                  (defun ,(second fun) (stream)
-                    (read-unsigned-be ,bytes stream))
-                  (defun ,(third fun) (stream)
-                    (unsigned-to-signed (read-unsigned-le ,bytes stream) ,bytes))
-                  (defun ,(fourth fun) (stream)
-                    (read-unsigned-le ,bytes stream)))))))
+                  (defun ,(first fun) (buffer)
+                    (unsigned-to-signed (read-unsigned-be ,bytes buffer) ,bytes))
+                  (defun ,(second fun) (buffer)
+                    (read-unsigned-be ,bytes buffer))
+                  (defun ,(third fun) (buffer)
+                    (unsigned-to-signed (read-unsigned-le ,bytes buffer) ,bytes))
+                  (defun ,(fourth fun) (buffer)
+                    (read-unsigned-le ,bytes buffer)))))))
 
 (defmacro make-writers (&rest bitlens)
   (let ((names (mapcar (lambda (n)

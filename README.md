@@ -1,5 +1,9 @@
 # fast-io
 
+**Now with
+[static-vectors](https://github.com/sionescu/static-vectors)
+support!**
+
 ```lisp
 (deftype octet '(unsigned-byte 8))
 (deftype octet-vector '(simple-array octet (*)))
@@ -42,10 +46,10 @@ reading and writing either a stream or a vector:
 ```lisp
 ;;; Write a byte or sequence, optionally to a stream:
 
-(with-fast-output (buffer [STREAM])
+(with-fast-output (buffer [STREAM | :vector | :static])
   (fast-write-byte BYTE buffer))
 
-(with-fast-output (buffer [STREAM])
+(with-fast-output (buffer [STREAM | :vector | :static])
   (fast-write-sequence OCTET-VECTOR buffer [START [END]]))
 
 ;;; Read from a vector or stream:
@@ -71,6 +75,25 @@ little-endian reads, in the following forms:
 
 * `read[u]{8,16,32,64,128}{-be,-le}`: Similarly, `(read64-le BUFFER)`
   will read a 64-bit value from the buffer with little-endian layout.
+
+## Static Vectors
+
+You may now specify `:static` instead of a stream to
+`WITH-OUTPUT-BUFFER`.  This returns an octet-vector created with
+[static-vectors](https://github.com/sionescu/static-vectors),
+which means that passing the buffered data directly to a foreign
+function is now that much more efficient:
+
+```lisp
+(let ((data (with-fast-output (buffer :static)
+              (buffer-some-data buffer))))
+  (foreign-send (static-vectors:static-vector-pointer data))
+  (static-vectors:free-static-vector data))
+```
+
+Note that the restriction for manually freeing the result remains.
+This avoids multiple inefficient (i.e., byte-by-byte) copies to
+foreign memory.
 
 ## Streams
 

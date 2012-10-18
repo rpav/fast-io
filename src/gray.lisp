@@ -10,7 +10,7 @@
   (call-next-method)
   (let ((*default-output-buffer-size* (or buffer-size *default-output-buffer-size*)))
     (with-slots (buffer) self
-      (setf buffer (make-output-buffer :stream stream)))))
+      (setf buffer (make-output-buffer :output stream)))))
 
 (defmethod stream-write-sequence ((stream fast-output-stream) sequence start end
                                   &key &allow-other-keys)
@@ -20,7 +20,7 @@
 
 (defun finish-output-stream (stream)
   (with-slots (buffer) stream
-    (if (output-buffer-stream buffer)
+    (if (streamp (output-buffer-output buffer))
         (flush buffer)
         (finish-output-buffer buffer))))
 

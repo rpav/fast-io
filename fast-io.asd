@@ -3,7 +3,7 @@
   :author "Ryan Pavlik"
   :license "NewBSD"
 
-  :depends-on (:alexandria :trivial-gray-streams)
+  :depends-on (:alexandria :trivial-gray-streams :static-vectors)
 
   :pathname "src"
   :serial t

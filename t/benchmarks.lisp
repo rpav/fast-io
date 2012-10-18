@@ -66,6 +66,12 @@
    (with-fast-output (buffer)
      (fast-write-sequence vec buffer))))
 
+(bench (50000)
+  (static-vectors:free-static-vector
+   (with-fast-output (buffer :static)
+     (dotimes (i 50)
+       (fast-write-byte 0 buffer)))))
+
  ;; Fast-io streams
 
 (bench (1000000)
