@@ -4,6 +4,7 @@
 
 (defvar *default-output-buffer-size* 16)
 
+(declaim (inline output-buffer-vector output-buffer-fill output-buffer-len))
 (defstruct output-buffer
   (vector (make-octet-vector *default-output-buffer-size*)
    :type octet-vector)
@@ -66,7 +67,8 @@
 
 (defun fast-write-byte (byte output-buffer)
   (declare (type octet byte)
-           (type output-buffer output-buffer))
+           (type output-buffer output-buffer)
+           (optimize (speed 3) (safety 0)))
   (when (= (output-buffer-fill output-buffer)
            (array-dimension (output-buffer-vector output-buffer) 0))
     (if (streamp (output-buffer-output output-buffer))

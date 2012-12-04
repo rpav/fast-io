@@ -2,6 +2,7 @@
   :description "Alternative I/O mechanism to a stream or vector"
   :author "Ryan Pavlik"
   :license "NewBSD"
+  :version "1.0"
 
   :depends-on (:alexandria :trivial-gray-streams :static-vectors)
 

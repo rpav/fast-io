@@ -12,6 +12,7 @@
 
   :components
   ((:file "package")
+   (:file "benchmark-defs")
 
    (checkl:tests "basic")
    (checkl:tests "gray")
