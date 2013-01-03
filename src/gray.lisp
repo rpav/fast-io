@@ -2,7 +2,8 @@
 
  ;; fast-output-stream
 
-(defclass fast-output-stream (stream trivial-gray-stream-mixin)
+(defclass fast-output-stream (#-lispworks stream
+                              trivial-gray-stream-mixin)
   ((buffer :type output-buffer)))
 
 (defmethod initialize-instance ((self fast-output-stream) &key stream
