@@ -49,7 +49,8 @@
 (defun flush (output-buffer)
   (when (> (output-buffer-fill output-buffer) 0)
     (write-sequence (output-buffer-vector output-buffer)
-                    (output-buffer-output output-buffer))
+                    (output-buffer-output output-buffer)
+                    :start 0 :end (output-buffer-fill output-buffer))
     (prog1 (output-buffer-fill output-buffer)
       (setf (output-buffer-fill output-buffer) 0))))
 
