@@ -2,9 +2,11 @@
   (:use #:cl #:alexandria #:trivial-gray-streams)
   (:export #:*default-output-buffer-size*
 
-           #:octet #:index
+           #:octet #:octet-vector #:index
 
            #:make-octet-vector #:octets-from
+
+           #:buffer-position
 
            #:fast-read-byte #:fast-write-byte
            #:fast-read-sequence #:fast-write-sequence

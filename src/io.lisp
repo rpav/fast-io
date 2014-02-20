@@ -19,6 +19,13 @@
   (pos 0 :type index)
   (stream nil))
 
+(defun buffer-position (buffer)
+  "Return the number of bytes read (for an INPUT-BUFFER) or written
+(for an OUTPUT-BUFFER)"
+  (etypecase buffer
+    (input-buffer (input-buffer-pos buffer))
+    (output-buffer (output-buffer-len buffer))))
+
 (declaim (ftype (function (index) octet-vector) make-octet-vector)
          (inline make-octet-vector))
 (defun make-octet-vector (len)
@@ -163,8 +170,8 @@
          (flush ,buffer)
          (finish-output-buffer ,buffer))))
 
-(defmacro with-fast-input ((buffer vector &optional stream) &body body)
-  `(let ((,buffer (make-input-buffer :vector ,vector :stream ,stream)))
+(defmacro with-fast-input ((buffer vector &optional stream (offset 0)) &body body)
+  `(let ((,buffer (make-input-buffer :vector ,vector :stream ,stream :pos ,offset)))
      ,@body))
 
  ;; READx and WRITEx
