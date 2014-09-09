@@ -39,9 +39,12 @@
 (defun concat-buffer (buffer)
   (let* ((len (output-buffer-len buffer))
          (array
+           #+fast-io-sv
            (if (eq :static (output-buffer-output buffer))
                (static-vectors:make-static-vector (the index len))
-               (make-octet-vector len))))
+               (make-octet-vector len))
+           #-fast-io-sv
+           (make-octet-vector len)))
     (loop as i = 0 then (+ i (length a))
           for a in (output-buffer-queue buffer) do
             (replace (the octet-vector array)
