@@ -1,9 +1,9 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (push :fast-io *features*))
+  (pushnew :fast-io *features*))
 
 #+(or sbcl ccl cmucl ecl lispworks allegro)
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (push :fast-io-sv *features*))
+  (pushnew :fast-io-sv *features*))
 
 (defsystem :fast-io
   :description "Alternative I/O mechanism to a stream or vector"
