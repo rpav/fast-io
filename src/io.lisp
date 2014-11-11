@@ -166,7 +166,7 @@
   (concat-buffer output-buffer))
 
 (defmacro with-fast-output ((buffer &optional output) &body body)
-  "Create `BUFFER`, optionally outputting to ``."
+  "Create `BUFFER`, optionally outputting to `OUTPUT`."
   `(let ((,buffer (make-output-buffer :output ,output)))
      ,@body
      (if (streamp (output-buffer-output ,buffer))

@@ -28,6 +28,6 @@
            #:read32-le #:readu32-le #:read32-be #:readu32-be
            #:read64-le #:readu64-le #:read64-be #:readu64-be
            #:read128-le #:readu128-le #:read128-be #:readu128-be
-           
+
            #:fast-output-stream #:fast-input-stream
            #:finish-output-stream))
