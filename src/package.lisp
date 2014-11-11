@@ -6,7 +6,10 @@
 
            #:make-octet-vector #:octets-from
 
+           #:make-output-buffer #:finish-output-buffer
            #:buffer-position
+
+           #:make-input-buffer
 
            #:fast-read-byte #:fast-write-byte
            #:fast-read-sequence #:fast-write-sequence
