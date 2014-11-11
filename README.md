@@ -122,7 +122,7 @@ Which is exactly what is defined and exported from `fast-io`.  Also:
 ### Buffers
 
 * `make-input-buffer &key VECTOR STREAM POS`<br> Create an input buffer for use with input functions.  `:vector` specifies the vector to be read from.  `:stream` specifies the stream to read from.  `:pos` specifies the offset to start reading into `VECTOR`.
-* `make-output-buffer &key OUTPUT`<br> Create an output buffer for use with output functions. `:output` specifies an output stream.
+* `make-output-buffer &key OUTPUT`<br> Create an output buffer for use with output functions. `:output` specifies an output stream.  If `:output :static` is specified, and static-vectors is supported, output will be to a static-vector.
 * `finish-output-buffer BUFFER`<br> Finish the output and return the complete octet-vector.
 * `buffer-position BUFFER`<br> Return the current read/write position for `BUFFER`.
 
