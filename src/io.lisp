@@ -125,7 +125,7 @@
                      :start1 (output-buffer-fill output-buffer)
                      :start2 start2
                      :end2 end)
-            (setf start2 buffer-remaining)
+            (incf start2 buffer-remaining)
             (incf (output-buffer-fill output-buffer)
                   (min buffer-remaining len)))
           (when (< start2 len)
