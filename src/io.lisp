@@ -128,14 +128,14 @@
             (incf start2 buffer-remaining)
             (incf (output-buffer-fill output-buffer)
                   (min buffer-remaining len)))
-          (when (< start2 len)
-            (let ((num-bytes (- (or end (length sequence)) start2)))
-              (extend output-buffer num-bytes)
+          (let ((sequence-remaining (- (or end (length sequence)) start2)))
+            (when (> sequence-remaining 0)
+              (extend output-buffer sequence-remaining)
               (replace (output-buffer-vector output-buffer)
                        (the octet-vector sequence)
                        :start2 start2
                        :end2 end)
-              (incf (output-buffer-fill output-buffer) num-bytes)))
+              (incf (output-buffer-fill output-buffer) sequence-remaining)))
           (incf (output-buffer-len output-buffer) len)
           len))))
 
