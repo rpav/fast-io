@@ -27,7 +27,7 @@
 
  ;; fast-input-stream
 
-(defclass fast-input-stream (stream trivial-gray-stream-mixin)
+(defclass fast-input-stream (#-lispworks stream trivial-gray-stream-mixin)
   ((buffer :type input-buffer)))
 
 (defmethod initialize-instance ((self fast-input-stream) &key stream
