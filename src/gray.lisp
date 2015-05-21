@@ -13,6 +13,10 @@
     (with-slots (buffer) self
       (setf buffer (make-output-buffer :output stream)))))
 
+(defmethod stream-write-byte ((stream fast-output-stream) byte)
+  (with-slots (buffer) stream
+    (fast-write-byte byte buffer)))
+
 (defmethod stream-write-sequence ((stream fast-output-stream) sequence start end
                                   &key &allow-other-keys)
   (with-slots (buffer) stream
