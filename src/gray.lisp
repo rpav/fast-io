@@ -2,7 +2,7 @@
 
  ;; fast-output-stream
 
-(defclass fast-output-stream (#-lispworks stream
+(defclass fast-output-stream (#-(or lispworks clisp) stream
                               trivial-gray-stream-mixin)
   ((buffer :type output-buffer)))
 
@@ -12,6 +12,10 @@
   (let ((*default-output-buffer-size* (or buffer-size *default-output-buffer-size*)))
     (with-slots (buffer) self
       (setf buffer (make-output-buffer :output stream)))))
+
+(defmethod stream-write-byte ((stream fast-output-stream) byte)
+  (with-slots (buffer) stream
+    (fast-write-byte byte buffer)))
 
 (defmethod stream-write-sequence ((stream fast-output-stream) sequence start end
                                   &key &allow-other-keys)
@@ -27,7 +31,7 @@
 
  ;; fast-input-stream
 
-(defclass fast-input-stream (stream trivial-gray-stream-mixin)
+(defclass fast-input-stream (#-(or lispworks clisp) stream trivial-gray-stream-mixin)
   ((buffer :type input-buffer)))
 
 (defmethod initialize-instance ((self fast-input-stream) &key stream
