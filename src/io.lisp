@@ -259,15 +259,19 @@
                collect
                `(progn
                   (defun ,(first fun) (value buffer)
+                    (declare (type (signed-byte ,bits) value))
                     (write-unsigned-be (the (unsigned-byte ,bits)
                                             (signed-to-unsigned value ,bytes)) ,bytes buffer))
                   (defun ,(second fun) (value buffer)
+                    (declare (type (unsigned-byte ,bits) value))
                     (write-unsigned-be (the (unsigned-byte ,bits) value)
                                        ,bytes buffer))
                   (defun ,(third fun) (value buffer)
+                    (declare (type (signed-byte ,bits) value))
                     (write-unsigned-le (the (unsigned-byte ,bits)
                                             (signed-to-unsigned value ,bytes)) ,bytes buffer))
                   (defun ,(fourth fun) (value buffer)
+                    (declare (type (unsigned-byte ,bits) value))
                     (write-unsigned-le (the (unsigned-byte ,bits) value)
                                        ,bytes buffer)))))))
 
