@@ -163,7 +163,12 @@
     start1))
 
 (defun finish-output-buffer (output-buffer)
-  (concat-buffer output-buffer))
+  "Finish an output buffer. If it is backed by a vector (static or otherwise)
+it returns the final octet vector. If it is backed by a stream it ensures that
+all data has been flushed to the stream."
+  (if (streamp (output-buffer-output output-buffer))
+      (flush output-buffer)
+      (concat-buffer output-buffer)))
 
 (defmacro with-fast-output ((buffer &optional output) &body body)
   "Create `BUFFER`, optionally outputting to `OUTPUT`."
