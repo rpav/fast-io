@@ -79,7 +79,7 @@
 (defun fast-write-byte (byte output-buffer)
   (declare (type octet byte)
            (type output-buffer output-buffer)
-           (optimize (speed 3) (safety 0)))
+           (optimize (speed 3) (safety 1)))
   (when (= (output-buffer-fill output-buffer)
            (array-dimension (output-buffer-vector output-buffer) 0))
     (if (streamp (output-buffer-output output-buffer))
