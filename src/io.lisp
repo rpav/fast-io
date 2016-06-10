@@ -286,7 +286,7 @@ all data has been flushed to the stream."
 (declaim (inline write8 writeu8 read8 readu8))
 (defun write8 (value buffer)
   (declare (type (signed-byte 8) value))
-  (fast-write-byte (signed-to-unsigned value 8) buffer))
+  (fast-write-byte (signed-to-unsigned value 1) buffer))
 
 (defun writeu8 (value buffer)
   (declare (type (unsigned-byte 8) value))
@@ -298,3 +298,13 @@ all data has been flushed to the stream."
 
 (defun readu8 (buffer)
   (fast-read-byte buffer))
+
+(setf (symbol-function 'write8-le) #'write8)
+(setf (symbol-function 'write8-be) #'write8)
+(setf (symbol-function 'writeu8-le) #'writeu8)
+(setf (symbol-function 'writeu8-be) #'writeu8)
+
+(setf (symbol-function 'read8-le) #'read8)
+(setf (symbol-function 'read8-be) #'read8)
+(setf (symbol-function 'readu8-le) #'readu8)
+(setf (symbol-function 'readu8-be) #'readu8)
