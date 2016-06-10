@@ -280,10 +280,21 @@ all data has been flushed to the stream."
                     (write-unsigned-le (the (unsigned-byte ,bits) value)
                                        ,bytes buffer)))))))
 
-(make-writers 8 16 32 64 128)
-(make-readers 8 16 32 64 128)
+(make-writers 16 32 64 128)
+(make-readers 16 32 64 128)
 
-(setf (symbol-function 'write8) #'write8-le)
-(setf (symbol-function 'writeu8) #'writeu8-le)
-(setf (symbol-function 'read8) #'read8-le)
-(setf (symbol-function 'readu8) #'readu8-le)
+(declaim (inline write8 writeu8 read8 readu8))
+(defun write8 (value buffer)
+  (declare (type (signed-byte 8) value))
+  (fast-write-byte (signed-to-unsigned value 8) buffer))
+
+(defun writeu8 (value buffer)
+  (declare (type (unsigned-byte 8) value))
+  (fast-write-byte value buffer))
+
+
+(defun read8 (buffer)
+  (unsigned-to-signed (fast-read-byte buffer) 8))
+
+(defun readu8 (buffer)
+  (fast-read-byte buffer))
