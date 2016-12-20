@@ -9,11 +9,13 @@
            #:make-output-buffer #:finish-output-buffer
            #:buffer-position
 
-           #:make-input-buffer
+           #:make-input-buffer #:input-buffer-stream
 
            #:fast-read-byte #:fast-write-byte
            #:fast-read-sequence #:fast-write-sequence
            #:with-fast-input #:with-fast-output
+
+           #:fast-seek
 
            #:write8 #:writeu8
            #:write8-le #:writeu8-le #:write8-be #:writeu8-be
