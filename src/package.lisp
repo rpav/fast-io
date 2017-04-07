@@ -20,6 +20,7 @@
            #:write8 #:writeu8
            #:write8-le #:writeu8-le #:write8-be #:writeu8-be
            #:write16-le #:writeu16-le #:write16-be #:writeu16-be
+           #:write24-le #:writeu24-le #:write24-be #:writeu24-be
            #:write32-le #:writeu32-le #:write32-be #:writeu32-be
            #:write64-le #:writeu64-le #:write64-be #:writeu64-be
            #:write128-le #:writeu128-le #:write128-be #:writeu128-be

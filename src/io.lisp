@@ -162,6 +162,10 @@
         (return-from fast-read-sequence (read-sequence sequence stream :start start1))))
     start1))
 
+(defun fast-seek (input-buffer position-spec)
+  (declare (type input-buffer input-buffer))
+  )
+
 (defun finish-output-buffer (output-buffer)
   "Finish an output buffer. If it is backed by a vector (static or otherwise)
 it returns the final octet vector. If it is backed by a stream it ensures that
@@ -280,8 +284,8 @@ all data has been flushed to the stream."
                     (write-unsigned-le (the (unsigned-byte ,bits) value)
                                        ,bytes buffer)))))))
 
-(make-writers 16 32 64 128)
-(make-readers 16 32 64 128)
+(make-writers 16 24 32 64 128)
+(make-readers 16 24 32 64 128)
 
 (declaim (inline write8 writeu8 read8 readu8))
 (defun write8 (value buffer)
