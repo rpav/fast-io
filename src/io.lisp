@@ -298,7 +298,7 @@ all data has been flushed to the stream."
 
 
 (defun read8 (buffer)
-  (unsigned-to-signed (fast-read-byte buffer) 8))
+  (unsigned-to-signed (fast-read-byte buffer) 1))
 
 (defun readu8 (buffer)
   (fast-read-byte buffer))
