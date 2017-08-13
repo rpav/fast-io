@@ -21,10 +21,16 @@
 
 (defun buffer-position (buffer)
   "Return the number of bytes read (for an INPUT-BUFFER) or written
-(for an OUTPUT-BUFFER)"
+\(for an OUTPUT-BUFFER)"
   (etypecase buffer
     (input-buffer (input-buffer-pos buffer))
     (output-buffer (output-buffer-len buffer))))
+
+(defun (setf buffer-position) (new-value buffer)
+  "Set the current position inside an INPUT-BUFFER."
+  (etypecase buffer
+    (input-buffer (setf (input-buffer-pos buffer) new-value))
+    (output-buffer (error "Unable to set position for OUTPUT-BUFFER."))))
 
 (declaim (ftype (function (index) octet-vector) make-octet-vector)
          (inline make-octet-vector))
