@@ -3,6 +3,7 @@
   (:export #:*default-output-buffer-size*
 
            #:octet #:octet-vector #:index
+           #:input-buffer #:output-buffer
 
            #:make-octet-vector #:octets-from
 
