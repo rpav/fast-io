@@ -11,6 +11,7 @@
            #:buffer-position
 
            #:make-input-buffer #:input-buffer-stream
+           #:input-buffer-vector #:input-buffer-stream
 
            #:fast-read-byte #:fast-write-byte
            #:fast-read-sequence #:fast-write-sequence
