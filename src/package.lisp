@@ -16,7 +16,7 @@
            #:fast-read-sequence #:fast-write-sequence
            #:with-fast-input #:with-fast-output
 
-           #:fast-seek
+           ;#:fast-seek
 
            #:write8 #:writeu8
            #:write8-le #:writeu8-le #:write8-be #:writeu8-be

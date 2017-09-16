@@ -162,6 +162,7 @@
         (return-from fast-read-sequence (read-sequence sequence stream :start start1))))
     start1))
 
+#+nil
 (defun fast-seek (input-buffer position-spec)
   (declare (type input-buffer input-buffer))
   )
