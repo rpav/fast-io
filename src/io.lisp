@@ -94,12 +94,11 @@
 
 (defun fast-read-byte (input-buffer &optional (eof-error-p t) eof-value)
   (declare (type input-buffer input-buffer))
-  (if-let ((vec (input-buffer-vector input-buffer))
-           (pos (input-buffer-pos input-buffer)))
+  (when-let ((vec (input-buffer-vector input-buffer))
+             (pos (input-buffer-pos input-buffer)))
     (when (< pos (length vec))
       (incf (input-buffer-pos input-buffer))
-      (return-from fast-read-byte (aref vec pos)))
-    (setf (input-buffer-vector input-buffer) nil))
+      (return-from fast-read-byte (aref vec pos))))
   (when-let (stream (input-buffer-stream input-buffer))
     (return-from fast-read-byte (read-byte stream eof-error-p eof-value)))
   (if eof-error-p
@@ -146,8 +145,8 @@
         (total-len (if end
                        (- end start)
                        (- (length sequence) start))))
-    (if-let ((vec (input-buffer-vector input-buffer))
-             (pos (input-buffer-pos input-buffer)))
+    (when-let ((vec (input-buffer-vector input-buffer))
+               (pos (input-buffer-pos input-buffer)))
       (when (< pos (length vec))
         (let ((len (min total-len (- (length vec) pos))))
           (replace sequence vec
@@ -155,17 +154,13 @@
                    :start2 pos
                    :end2 (+ pos len))
           (incf (input-buffer-pos input-buffer) len)
-          (incf start1 len)))
-      (setf (input-buffer-vector input-buffer) nil))
+          (incf start1 len))))
     (when (< start1 total-len)
       (when-let (stream (input-buffer-stream input-buffer))
-        (return-from fast-read-sequence (read-sequence sequence stream :start start1))))
+        (return-from fast-read-sequence
+          (read-sequence sequence stream :start start1
+                                         :end (+ total-len start1)))))
     start1))
-
-#+nil
-(defun fast-seek (input-buffer position-spec)
-  (declare (type input-buffer input-buffer))
-  )
 
 (defun finish-output-buffer (output-buffer)
   "Finish an output buffer. If it is backed by a vector (static or otherwise)
