@@ -162,11 +162,6 @@
                                          :end (+ total-len start1)))))
     start1))
 
-#+nil
-(defun fast-seek (input-buffer position-spec)
-  (declare (type input-buffer input-buffer))
-  )
-
 (defun finish-output-buffer (output-buffer)
   "Finish an output buffer. If it is backed by a vector (static or otherwise)
 it returns the final octet vector. If it is backed by a stream it ensures that
