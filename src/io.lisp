@@ -159,7 +159,9 @@
       (setf (input-buffer-vector input-buffer) nil))
     (when (< start1 total-len)
       (when-let (stream (input-buffer-stream input-buffer))
-        (return-from fast-read-sequence (read-sequence sequence stream :start start1))))
+        (return-from fast-read-sequence
+          (read-sequence sequence stream :start start1
+                                         :end (+ total-len start1)))))
     start1))
 
 #+nil
