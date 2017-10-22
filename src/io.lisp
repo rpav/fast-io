@@ -100,7 +100,10 @@
       (incf (input-buffer-pos input-buffer))
       (return-from fast-read-byte (aref vec pos))))
   (when-let (stream (input-buffer-stream input-buffer))
-    (return-from fast-read-byte (read-byte stream eof-error-p eof-value)))
+    (let ((byte (read-byte stream eof-error-p eof-value)))
+      (unless (equal byte eof-value)
+        (incf (input-buffer-pos input-buffer)))
+      (return-from fast-read-byte byte)))
   (if eof-error-p
       (error 'end-of-file :stream input-buffer)
       eof-value))
@@ -157,9 +160,11 @@
           (incf start1 len))))
     (when (< start1 total-len)
       (when-let (stream (input-buffer-stream input-buffer))
-        (return-from fast-read-sequence
-          (read-sequence sequence stream :start start1
-                                         :end (+ total-len start1)))))
+        (let ((bytes-read (read-sequence sequence stream
+                                         :start start1
+                                         :end (+ total-len start1))))
+          (incf (input-buffer-pos input-buffer) bytes-read)
+          (return-from fast-read-sequence bytes-read))))
     start1))
 
 (defun finish-output-buffer (output-buffer)
