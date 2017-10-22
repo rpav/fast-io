@@ -21,10 +21,36 @@
 
 (defun buffer-position (buffer)
   "Return the number of bytes read (for an INPUT-BUFFER) or written
-(for an OUTPUT-BUFFER)"
+   (for an OUTPUT-BUFFER)"
   (etypecase buffer
     (input-buffer (input-buffer-pos buffer))
     (output-buffer (output-buffer-len buffer))))
+
+;; Sometimes it is usefull just to skip the buffer instead of reading from it.
+(defun (setf buffer-position) (new-pos buffer)
+  "Set the buffer position for input-buffer"
+  (etypecase buffer
+    (input-buffer
+     (when-let* ((stream (input-buffer-stream buffer))
+                 (pos (input-buffer-pos buffer))
+                 (vec-len (length (input-buffer-vector buffer)))
+                 ;; Only need to update if pos or new-pos is in stream range.
+                 (stream-update-needed? (or (> pos vec-len)
+                                            (> new-pos vec-len)))
+                 (new-stream-pos (max 0 (- new-pos vec-len)))
+                 (vec-left       (max 0 (- vec-len pos)))
+                 (fp-diff (if (zerop new-stream-pos)
+                              ;; if new buffer pos is in vector range.
+                              ;; Need to rewind the stream or nothing.
+                              (min 0 (- vec-len pos))
+                              ;; if new buffer pos is in stream range.
+                              ;; Need to forward the stream or nothing.
+                              (max 0 (- new-pos pos vec-left)))))
+       (file-position stream (+ (file-position stream) fp-diff)))
+     (setf (slot-value buffer 'pos) new-pos))
+    (output-buffer (cerror "Ignore error"
+                           "Setting buffer-position for output-buffer~
+                            is not implemented. sorry."))))
 
 (declaim (ftype (function (index) octet-vector) make-octet-vector)
          (inline make-octet-vector))
