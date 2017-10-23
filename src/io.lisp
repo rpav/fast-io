@@ -31,22 +31,27 @@
   "Set the buffer position for input-buffer"
   (etypecase buffer
     (input-buffer
-     (when-let* ((stream (input-buffer-stream buffer))
-                 (pos (input-buffer-pos buffer))
-                 (vec-len (length (input-buffer-vector buffer)))
-                 ;; Only need to update if pos or new-pos is in stream range.
-                 (stream-update-needed? (or (> pos vec-len)
-                                            (> new-pos vec-len)))
-                 (new-stream-pos (max 0 (- new-pos vec-len)))
-                 (vec-left       (max 0 (- vec-len pos)))
-                 (fp-diff (if (zerop new-stream-pos)
-                              ;; if new buffer pos is in vector range.
-                              ;; Need to rewind the stream or nothing.
-                              (min 0 (- vec-len pos))
-                              ;; if new buffer pos is in stream range.
-                              ;; Need to forward the stream or nothing.
-                              (max 0 (- new-pos pos vec-left)))))
-       (file-position stream (+ (file-position stream) fp-diff)))
+     (let ((pos (input-buffer-pos buffer))
+           (vec-len (length (input-buffer-vector buffer))))
+       ;; Only need to update if pos or new-pos is in stream range.
+       (when-let* ((stream-update-needed? (or (> pos vec-len)
+                                              (> new-pos vec-len)))
+                   (stream (input-buffer-stream buffer))
+                   (stream-file-position (file-position stream))
+                   (pos-diff (- new-pos pos))
+                   (stream-diff (cond ((and (> pos vec-len)
+                                            (< new-pos vec-len))
+                                       ;; branch for pos in stream and new-pos
+                                       ;; is in vector.
+                                       (- vec-len pos))
+                                      ((and (< pos vec-len)
+                                            (> new-pos vec-len))
+                                       ;; branch for pos in vector. and new-pos
+                                       ;; is in stream.
+                                       (- pos-diff (- vec-len pos)))
+                                      ;; otherwise stream-diff = pos-diff.
+                                      (t pos-diff))))
+         (file-position stream (+ stream-file-position stream-diff))))
      (setf (slot-value buffer 'pos) new-pos))
     (output-buffer (cerror "Ignore error"
                            "Setting buffer-position for output-buffer~
