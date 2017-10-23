@@ -83,22 +83,9 @@
   (with-slots (buffer) stream
     (setf (buffer-position buffer) new-pos)))
 
-(defmethod peek-byte ((stream fast-input-stream) &optional peek-type eof-error-p eof-value)
+(defmethod peek-byte ((stream fast-input-stream) &optional peek-type (eof-error-p t) eof-value)
   (with-slots (buffer) stream
-    (let* ((vec (input-buffer-vector buffer))
-           (vec-len (length vec))
-           (stream (input-buffer-stream buffer))
-           (pos (input-buffer-pos buffer)))
-      (if (and (>= pos vec-len) stream)
-          ;; Need to read from stream.
-          (peek-byte stream peek-type eof-error-p eof-value)
-          ;; Need to read from vector.
-          (when-let* ((vec vec)
-                      (vec-len (length vec))
-                      (in-vec? (> vec-len pos)))
-            (if (>= vec-len pos)
-                (aref vec pos)
-                eof-value))))))
+    (fast-peek-byte buffer peek-type eof-error-p eof-value)))
 
 (defmethod stream-read-byte ((stream fast-input-stream))
   (with-slots (buffer) stream
