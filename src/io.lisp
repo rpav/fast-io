@@ -105,6 +105,20 @@
       (error 'end-of-file :stream input-buffer)
       eof-value))
 
+(defun fast-peek-byte (input-buffer &optional peek-type (eof-error-p t) eof-value)
+  "This is like `peek-byte' only for fast-io input-buffers."
+  (declare (type input-buffer input-buffer))
+  (loop :for octet = (fast-read-byte input-buffer eof-error-p :eof)
+     :for new-pos :from (input-buffer-pos input-buffer)
+     :until (cond ((eq octet :eof)
+                   (return eof-value))
+                  ((null peek-type))
+                  ((eq peek-type 't)
+                   (plusp octet))
+                  ((= octet peek-type)))
+     :finally (setf (buffer-position input-buffer) new-pos)
+       (return octet)))
+
 (defun fast-write-sequence (sequence output-buffer &optional (start 0) end)
   (if (streamp (output-buffer-output output-buffer))
       (progn
