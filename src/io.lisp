@@ -29,33 +29,36 @@
 ;; Sometimes it is usefull just to skip the buffer instead of reading from it.
 (defun (setf buffer-position) (new-pos buffer)
   "Set the buffer position for input-buffer"
-  (etypecase buffer
-    (input-buffer
-     (let ((pos (input-buffer-pos buffer))
-           (vec-len (length (input-buffer-vector buffer))))
-       ;; Only need to update if pos or new-pos is in stream range.
-       (when-let* ((stream-update-needed? (or (> pos vec-len)
-                                              (> new-pos vec-len)))
-                   (stream (input-buffer-stream buffer))
-                   (stream-file-position (file-position stream))
-                   (pos-diff (- new-pos pos))
-                   (stream-diff (cond ((and (> pos vec-len)
-                                            (< new-pos vec-len))
-                                       ;; branch for pos in stream and new-pos
-                                       ;; is in vector.
-                                       (- vec-len pos))
-                                      ((and (< pos vec-len)
-                                            (> new-pos vec-len))
-                                       ;; branch for pos in vector. and new-pos
-                                       ;; is in stream.
-                                       (- pos-diff (- vec-len pos)))
-                                      ;; otherwise stream-diff = pos-diff.
-                                      (t pos-diff))))
-         (file-position stream (+ stream-file-position stream-diff))))
-     (setf (slot-value buffer 'pos) new-pos))
-    (output-buffer (cerror "Ignore error"
-                           "Setting buffer-position for output-buffer~
-                            is not implemented. sorry."))))
+  (check-type buffer input-buffer)
+  (let* ((pos (input-buffer-pos buffer))
+         (vec (input-buffer-vector buffer))
+         (vec-len (length vec)))
+    (declare (optimize (speed 3) (safety 1))
+             (type octet-vector vec)
+             (type non-negative-fixnum pos vec-len new-pos))
+    ;; Only need to update if pos or new-pos is in stream range.
+    (when-let ((stream-update-needed? (or (> pos vec-len)
+                                          (> new-pos vec-len)))
+               (stream (input-buffer-stream buffer)))
+      (let* ((stream-file-pos (file-position stream))
+             (pos-diff (- new-pos pos))
+             (stream-diff (cond ((and (> pos vec-len)
+                                      (< new-pos vec-len))
+                                 ;; branch for pos in stream and new-pos
+                                 ;; is in vector.
+                                 (- vec-len pos))
+                                ((and (< pos vec-len)
+                                      (> new-pos vec-len))
+                                 ;; branch for pos in vector. and new-pos
+                                 ;; is in stream.
+                                 (- pos-diff (- vec-len pos)))
+                                ;; otherwise stream-diff = pos-diff.
+                                (t pos-diff)))
+             (new-stream-pos (+ stream-file-pos stream-diff)))
+        (declare (type non-negative-fixnum stream-file-pos new-stream-pos)
+                 (type fixnum pos-diff stream-diff))
+        (file-position stream new-stream-pos))))
+  (setf (slot-value buffer 'pos) new-pos))
 
 (declaim (ftype (function (index) octet-vector) make-octet-vector)
          (inline make-octet-vector))
