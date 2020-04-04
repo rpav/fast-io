@@ -21,10 +21,44 @@
 
 (defun buffer-position (buffer)
   "Return the number of bytes read (for an INPUT-BUFFER) or written
-(for an OUTPUT-BUFFER)"
+   (for an OUTPUT-BUFFER)"
   (etypecase buffer
     (input-buffer (input-buffer-pos buffer))
     (output-buffer (output-buffer-len buffer))))
+
+;; Sometimes it is usefull just to skip the buffer instead of reading from it.
+(defun (setf buffer-position) (new-pos buffer)
+  "Set the buffer position for input-buffer"
+  (check-type buffer input-buffer)
+  (let* ((pos (input-buffer-pos buffer))
+         (vec (input-buffer-vector buffer))
+         (vec-len (length vec)))
+    (declare (optimize (speed 3) (safety 1))
+             (type octet-vector vec)
+             (type non-negative-fixnum pos vec-len new-pos))
+    ;; Only need to update if pos or new-pos is in stream range.
+    (when-let ((stream-update-needed? (or (> pos vec-len)
+                                          (> new-pos vec-len)))
+               (stream (input-buffer-stream buffer)))
+      (let* ((stream-file-pos (file-position stream))
+             (pos-diff (- new-pos pos))
+             (stream-diff (cond ((and (> pos vec-len)
+                                      (< new-pos vec-len))
+                                 ;; branch for pos in stream and new-pos
+                                 ;; is in vector.
+                                 (- vec-len pos))
+                                ((and (< pos vec-len)
+                                      (> new-pos vec-len))
+                                 ;; branch for pos in vector. and new-pos
+                                 ;; is in stream.
+                                 (- pos-diff (- vec-len pos)))
+                                ;; otherwise stream-diff = pos-diff.
+                                (t pos-diff)))
+             (new-stream-pos (+ stream-file-pos stream-diff)))
+        (declare (type non-negative-fixnum stream-file-pos new-stream-pos)
+                 (type fixnum pos-diff stream-diff))
+        (file-position stream new-stream-pos))))
+  (setf (slot-value buffer 'pos) new-pos))
 
 (declaim (ftype (function (index) octet-vector) make-octet-vector)
          (inline make-octet-vector))
@@ -100,7 +134,10 @@
       (incf (input-buffer-pos input-buffer))
       (return-from fast-read-byte (aref vec pos))))
   (when-let (stream (input-buffer-stream input-buffer))
-    (return-from fast-read-byte (read-byte stream eof-error-p eof-value)))
+    (let ((byte (read-byte stream eof-error-p eof-value)))
+      (unless (equal byte eof-value)
+        (incf (input-buffer-pos input-buffer)))
+      (return-from fast-read-byte byte)))
   (if eof-error-p
       (error 'end-of-file :stream input-buffer)
       eof-value))
@@ -157,9 +194,11 @@
           (incf start1 len))))
     (when (< start1 total-len)
       (when-let (stream (input-buffer-stream input-buffer))
-        (return-from fast-read-sequence
-          (read-sequence sequence stream :start start1
-                                         :end (+ total-len start1)))))
+        (let ((bytes-read (read-sequence sequence stream
+                                         :start start1
+                                         :end (+ total-len start1))))
+          (incf (input-buffer-pos input-buffer) bytes-read)
+          (return-from fast-read-sequence bytes-read))))
     start1))
 
 (defun finish-output-buffer (output-buffer)
