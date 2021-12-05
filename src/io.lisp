@@ -4,6 +4,11 @@
 
 (defvar *default-output-buffer-size* 16)
 
+(declaim (ftype (function (index) octet-vector) make-octet-vector)
+         (inline make-octet-vector))
+(defun make-octet-vector (len)
+  (make-array (the index len) :element-type 'octet))
+
 (declaim (inline output-buffer-vector output-buffer-fill output-buffer-len))
 (defstruct output-buffer
   (vector (make-octet-vector *default-output-buffer-size*)
@@ -59,11 +64,6 @@
                  (type fixnum pos-diff stream-diff))
         (file-position stream new-stream-pos))))
   (setf (slot-value buffer 'pos) new-pos))
-
-(declaim (ftype (function (index) octet-vector) make-octet-vector)
-         (inline make-octet-vector))
-(defun make-octet-vector (len)
-  (make-array (the index len) :element-type 'octet))
 
 (defun octets-from (sequence)
   (let ((vec (make-octet-vector (length sequence))))
