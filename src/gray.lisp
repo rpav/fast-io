@@ -24,10 +24,6 @@
     (with-slots (buffer) self
       (setf buffer (make-output-buffer :output stream)))))
 
-(defmethod output-stream-p ((stream fast-output-stream))
-  (with-slots (buffer) stream
-    (and (typep buffer 'output-buffer))))
-
 (defmethod stream-element-type ((stream fast-output-stream))
   "Return the underlying array element-type.
    Should always return '(unsigned-byte 8)."
@@ -65,10 +61,6 @@
   (call-next-method)
   (with-slots (buffer) self
     (setf buffer (make-input-buffer :vector vector :stream stream))))
-
-(defmethod input-stream-p ((stream fast-input-stream))
-  (with-slots (buffer) stream
-    (and (typep buffer 'input-buffer))))
 
 (defmethod stream-element-type ((stream fast-input-stream))
   "Return element-type of the underlying vector or stream.
