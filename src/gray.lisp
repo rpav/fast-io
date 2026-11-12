@@ -10,7 +10,7 @@
     (buffer-position buffer)))
 
 (defmethod open-stream-p ((stream fast-io-stream))
-  (slot-value stream 'openep))
+  (slot-value stream 'openp))
 
  ;; fast-output-stream
 
